@@ -7,6 +7,7 @@ from torch.nn import CrossEntropyLoss
 from torch.optim import SGD
 from torch.utils.data import DataLoader
 from torchvision.transforms import ToTensor
+import time
 
 if __name__ == '__main__':
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -21,6 +22,7 @@ if __name__ == '__main__':
     all_epoch = 100
     prev_acc = 0
     for current_epoch in range(all_epoch):
+        epoch_start = time.time()
         model.train()
         for idx, (train_x, train_label) in enumerate(train_loader):
             train_x = train_x.to(device)
@@ -45,10 +47,12 @@ if __name__ == '__main__':
             all_sample_num += current_correct_num.shape[0]
         acc = all_correct_num / all_sample_num
         print('accuracy: {:.3f}'.format(acc), flush=True)
-        if not os.path.isdir("models"):
-            os.mkdir("models")
-        torch.save(model, 'models/mnist_{:.3f}.pkl'.format(acc))
+        # if not os.path.isdir("models"):
+        #     os.mkdir("models")
+        # torch.save(model, 'models/mnist_{:.3f}.pkl'.format(acc))
         if np.abs(acc - prev_acc) < 1e-4:
             break
         prev_acc = acc
+        epoch_end = time.time()
+        print("epoch {} time {}".format(current_epoch, epoch_end-epoch_start))
     print("Model finished training")
